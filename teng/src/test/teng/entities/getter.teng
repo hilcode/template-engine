@@ -1,0 +1,10 @@
+template org.example.Getter
+
+String type
+String name
+
+-----
+public ${type}$ ${name}$()
+{
+	return ${name}$;
+}

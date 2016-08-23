@@ -1,0 +1,24 @@
+template org.example.Entity
+
+end-of-line windows
+
+com.github.hilcode.teng.EntityInfo entity
+
+-----
+package org.example;
+
+public final class ${entity.name}$
+{
+#for com.github.hilcode.teng.FieldInfo loopVar : entity.fields
+	#if !loopVar.first
+
+	#end-if
+	%{ org.example.Field ( loopVar.item.type, loopVar.item.name ) }%
+#end-for
+#for com.github.hilcode.teng.FieldInfo loopVar : entity.fields
+
+	@{org.example.Getter(loopVar.item.type, loopVar.item.name)}@
+
+	@{org.example.Setter(loopVar.item.type, loopVar.item.name)}@
+#end-for
+}

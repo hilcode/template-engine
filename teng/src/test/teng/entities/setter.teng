@@ -1,0 +1,11 @@
+template org.example.Setter
+
+String type
+String name
+
+-----
+public Object ${name}$(final ${type}$ value)
+{
+	this.${name}$ = value;
+	return this;
+}

@@ -1,0 +1,8 @@
+template inline org.example.Field
+
+String type
+String name
+
+-----
+
+private ${type}$ ${name}$;

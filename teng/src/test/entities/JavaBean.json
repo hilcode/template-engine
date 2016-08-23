@@ -1,0 +1,13 @@
+{
+	"name" : "JavaBean",
+	"fields" : [
+		{
+			"type" : "String",
+			"name" : "name"
+		},
+		{
+			"type" : "String",
+			"name" : "name2"
+		}
+	]
+}
