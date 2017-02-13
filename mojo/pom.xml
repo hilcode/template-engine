@@ -10,9 +10,12 @@
 	<groupId>com.github.hilcode</groupId>
 	<artifactId>teng-maven-plugin</artifactId>
 	<packaging>maven-plugin</packaging>
-	<version>0.1</version>
+	<version>0.2</version>
 
 	<name>Teng Maven Plugin</name>
+	<description>
+		A Maven plugin for Teng.
+	</description>
 	<url>https://github.com/hilcode/template-engine</url>
 
 	<licenses>
@@ -39,6 +42,22 @@
 
 	</distributionManagement>
 
+	<scm>
+		<connection>scm:git:https://github.com/hilcode/template-engine.git</connection>
+		<developerConnection>scm:ssh:git@github.com:hilcode/template-engine.git</developerConnection>
+		<url>https://github.com/hilcode/template-engine</url>
+	</scm>
+
+	<developers>
+
+		<developer>
+			<id>1</id>
+			<name>Hilco Wijbenga</name>
+			<email>hilco.wijbenga@gmail.com</email>
+		</developer>
+
+	</developers>
+
 	<properties>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -51,7 +70,7 @@
 		<maven-compiler-plugin.version>3.5.1</maven-compiler-plugin.version>
 		<maven-dependency-plugin.version>2.10</maven-dependency-plugin.version>
 		<maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
-		<maven-gpg-plugin.version>1.5</maven-gpg-plugin.version>
+		<maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
 		<maven-install-plugin.version>2.5.2</maven-install-plugin.version>
 		<maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>
 		<maven-javadoc-plugin.version>2.10.4</maven-javadoc-plugin.version>
@@ -74,7 +93,7 @@
 		<dependency>
 			<groupId>com.github.hilcode</groupId>
 			<artifactId>teng</artifactId>
-			<version>0.1</version>
+			<version>0.2</version>
 		</dependency>
 
 		<dependency>
@@ -215,7 +234,7 @@
 					<executions>
 						<execution>
 							<id>attach-javadocs</id>
-							<phase>verify</phase>
+							<phase>pre-integration-test</phase>
 							<goals>
 								<goal>jar</goal>
 							</goals>
@@ -334,7 +353,7 @@
 					<executions>
 						<execution>
 							<id>attach-sources</id>
-							<phase>verify</phase>
+							<phase>pre-integration-test</phase>
 							<goals>
 								<goal>jar-no-fork</goal>
 							</goals>

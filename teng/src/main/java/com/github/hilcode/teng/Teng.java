@@ -76,7 +76,7 @@ public final class Teng
 		final ImmutableList.Builder<String> linesBuilder = ImmutableList.builder();
 		for (final String line : template.execute())
 		{
-			linesBuilder.add(prefix + line);
+			linesBuilder.add(line.trim().isEmpty() ? line : prefix + line);
 		}
 		return linesBuilder.build();
 	}

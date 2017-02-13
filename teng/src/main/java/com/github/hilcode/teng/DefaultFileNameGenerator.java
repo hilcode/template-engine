@@ -33,55 +33,70 @@ public final class DefaultFileNameGenerator
 		final String entityName = name.isPresent()
 				? name.get()
 				: model.getClass().getSimpleName() + template.getClass().getSimpleName();
-		final File file = new File(packageDir, entityName + ".java");
-		System.err.println(file);
-		return file;
+		return new File(packageDir, entityName + ".java");
 	}
 
 	public <MODEL> Optional<String> extractName(final MODEL model)
+	{
+		if (model.getClass().isEnum())
+		{
+			return Optional.of(Names.extractJavaClassName((Enum<?>) model));
+		}
+		final Optional<String> resultMethodGetName = extractUsingMethod(model, "getName");
+		if (resultMethodGetName.isPresent())
+		{
+			return resultMethodGetName;
+		}
+		final Optional<String> resultMethodName = extractUsingMethod(model, "name");
+		if (resultMethodName.isPresent())
+		{
+			return resultMethodName;
+		}
+		return extractNameField(model);
+	}
+
+	public static final <MODEL> Optional<String> extractUsingMethod(final MODEL model, final String methodName)
 	{
 		try
 		{
 			try
 			{
-				final Method getName = model.getClass().getMethod("getName");
-				if (getName.getReturnType() == String.class)
-				{
-					final Object result = getName.invoke(model);
-					return result != null ? Optional.of(result.toString()) : Optional.<String>absent();
-				}
-			}
-			catch (final NoSuchMethodException e)
-			{
-				// Ignore.
-			}
-			try
-			{
-				final Method nameMethod = model.getClass().getMethod("name");
+				final Method nameMethod = model.getClass().getMethod(methodName);
 				if (nameMethod.getReturnType() == String.class)
 				{
 					final Object result = nameMethod.invoke(model);
-					return result != null ? Optional.of(result.toString()) : Optional.<String>absent();
+					return result != null
+							? Optional.of(result.toString())
+							: Optional.<String> absent();
 				}
 			}
 			catch (final NoSuchMethodException e)
 			{
 				// Ignore.
 			}
+			return Optional.absent();
+		}
+		catch (final Exception e)
+		{
+			throw new TengException(
+					"Unable to execute method '" + methodName + "' on '" + model.getClass() + "': " + e.getMessage(),
+					e);
+		}
+	}
+
+	public static final <MODEL> Optional<String> extractNameField(final MODEL model)
+	{
+		try
+		{
 			try
 			{
-				final Field nameField = model.getClass().getField("name");
-				if (nameField.getType() == String.class)
+				final Field field = model.getClass().getField("name");
+				if (field.getType() == String.class)
 				{
-					final Object result = nameField.get(model);
-					if (result == null)
-					{
-						return Optional.absent();
-					}
-					else
-					{
-						return Optional.of(result.toString());
-					}
+					final Object result = field.get(model);
+					return result != null
+							? Optional.of(result.toString())
+							: Optional.<String> absent();
 				}
 			}
 			catch (final NoSuchFieldException e)
@@ -92,8 +107,9 @@ public final class DefaultFileNameGenerator
 		}
 		catch (final Exception e)
 		{
-			System.err.println(e.getMessage());
-			return Optional.absent();
+			throw new TengException(
+					"Unable to retrieve field 'name' from '" + model.getClass() + "': " + e.getMessage(),
+					e);
 		}
 	}
 }
