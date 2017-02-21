@@ -51,7 +51,9 @@ public final class TengParserState
 
 	public int indentationLevel = 0;
 
-	final List<Parameter> parameters = Lists.newArrayList();
+	public final List<Parameter> parameters = Lists.newArrayList();
+
+	public final List<Import> imports = Lists.newArrayList();
 
 	public TengParserState()
 	{

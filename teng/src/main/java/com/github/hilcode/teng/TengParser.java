@@ -23,6 +23,7 @@ import static com.google.common.base.Strings.repeat;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.io.Reader;
+import java.util.Collections;
 import java.util.List;
 import com.github.hilcode.teng.StateMachine.ModeAndState;
 import com.github.hilcode.teng.StateMachine.Transition;
@@ -47,6 +48,7 @@ public final class TengParser
 				PARAMETERS,
 				ImmutableList.of(
 						new TransitionParametersCommentOrEmptyLine(),
+						new TransitionParametersImport(),
 						new TransitionParametersBlockTemplateDelimitersSetting(),
 						new TransitionParametersInlineTemplateDelimitersSetting(),
 						new TransitionParametersVariableDelimitersSetting(),
@@ -64,7 +66,7 @@ public final class TengParser
 						new TransitionTemplateFor(),
 						new TransitionTemplateEndFor(),
 						new TransitionTemplateLine()));
-		this.fsm = new StateMachine<Line,Mode,TengParserState>(modes.build());
+		this.fsm = new StateMachine<Line, Mode, TengParserState>(modes.build());
 	}
 
 	public JavaTemplate parse(final Reader source)
@@ -102,18 +104,25 @@ public final class TengParser
 		state.templateBuilder.add(lineAndSource("}"));
 		//
 		final List<LineAndSource> templateBuilder = Lists.newArrayList();
+		final List<Import> allImports = Lists.newArrayList();
 		if (state.loopVarNeeded)
 		{
-			templateBuilder.add(lineAndSource("import com.github.hilcode.teng.LoopVar;"));
+			allImports.add(new Import("com.github.hilcode.teng.LoopVar"));
 		}
-		templateBuilder.add(lineAndSource("import com.github.hilcode.teng.Template;"));
+		allImports.add(new Import("com.github.hilcode.teng.Template"));
 		if (state.tengNeeded)
 		{
-			templateBuilder.add(lineAndSource("import com.github.hilcode.teng.Teng;"));
+			allImports.add(new Import("com.github.hilcode.teng.Teng"));
 		}
 		if (state.immutableListNeeded)
 		{
-			templateBuilder.add(lineAndSource("import com.google.common.collect.ImmutableList;"));
+			allImports.add(new Import("com.google.common.collect.ImmutableList"));
+		}
+		allImports.addAll(state.imports);
+		Collections.sort(allImports);
+		for (final Import import_ : allImports)
+		{
+			templateBuilder.add(lineAndSource("import " + import_.fullyQualifiedClass + ";"));
 		}
 		templateBuilder.add(lineAndSource(""));
 		if (state.templateName.packageName == PackageName.NONE)

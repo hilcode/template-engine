@@ -257,7 +257,7 @@ public class TengParserTest
 	public final void field()
 	{
 		final ImmutableList<String> lines = ImmutableList.of(
-				"template Field",
+				"template org.example.Field",
 				"",
 				"String type",
 				"String name",
@@ -273,7 +273,7 @@ public class TengParserTest
 	public final void getter()
 	{
 		final ImmutableList<String> lines = ImmutableList.of(
-				"template Getter",
+				"template org.example.Getter",
 				"",
 				"String type",
 				"String name",
@@ -292,7 +292,7 @@ public class TengParserTest
 	public final void setter()
 	{
 		final ImmutableList<String> lines = ImmutableList.of(
-				"template Setter",
+				"template org.example.Setter",
 				"",
 				"String type",
 				"String name",
@@ -324,9 +324,71 @@ public class TengParserTest
 				"public final class ${name}$",
 				"{",
 				"    #for com.github.hilcode.teng.stuff.FieldInfo loopVar : fields",
-				"\t@{ Field ( loopVar.item.type(), loopVar.item.name() ) }@",
+				"\t@{ org.example.Field ( loopVar.item.type(), loopVar.item.name() ) }@",
 				"    #end-for",
 				"    #for com.github.hilcode.teng.stuff.FieldInfo loopVar : fields",
+				"",
+				"\t@{org.example.Getter(loopVar.item.type(), loopVar.item.name())}@",
+				"",
+				"\t@{org.example.Setter(loopVar.item.type(), loopVar.item.name())}@",
+				"    #end-for",
+				"}");
+		compileTemplateJavaFile(outputTemplateJavaFile(lines));
+	}
+
+	@Test
+	public final void importClass()
+	{
+		field();
+		getter();
+		setter();
+		final ImmutableList<String> lines = ImmutableList.of(
+				"template org.example.Entity",
+				"",
+				"import com.github.hilcode.teng.stuff.FieldInfo",
+				"",
+				"String name",
+				"ImmutableList<FieldInfo> fields",
+				"",
+				"-----",
+				"public final class ${name}$",
+				"{",
+				"    #for FieldInfo loopVar : fields",
+				"\t@{ org.example.Field ( loopVar.item.type(), loopVar.item.name() ) }@",
+				"    #end-for",
+				"    #for FieldInfo loopVar : fields",
+				"",
+				"\t@{org.example.Getter(loopVar.item.type(), loopVar.item.name())}@",
+				"",
+				"\t@{org.example.Setter(loopVar.item.type(), loopVar.item.name())}@",
+				"    #end-for",
+				"}");
+		compileTemplateJavaFile(outputTemplateJavaFile(lines));
+	}
+
+	@Test
+	public final void importSeveralClasses()
+	{
+		field();
+		getter();
+		setter();
+		final ImmutableList<String> lines = ImmutableList.of(
+				"template org.example.Entity2",
+				"",
+				"import com.github.hilcode.teng.stuff.FieldInfo",
+				"import org.example.Getter",
+				"import org.example.Setter",
+				"",
+				"String name",
+				"ImmutableList<FieldInfo> fields",
+				"",
+				"-----",
+				"public final class ${name}$",
+				"{",
+				"    #for FieldInfo loopVar : fields",
+				"\t@{ Field ( loopVar.item.type(), loopVar.item.name() ) }@",
+				"    #end-for",
+				"    #for FieldInfo loopVar : fields",
 				"",
 				"\t@{Getter(loopVar.item.type(), loopVar.item.name())}@",
 				"",
