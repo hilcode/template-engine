@@ -17,14 +17,37 @@ package com.github.hilcode.teng;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.StringReader;
+import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.Locale;
+import javax.tools.Diagnostic;
+import javax.tools.DiagnosticCollector;
+import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
+import javax.tools.StandardJavaFileManager;
+import javax.tools.StandardLocation;
+import javax.tools.ToolProvider;
 import org.junit.Before;
 import org.junit.Test;
 import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
 public class TengParserTest
 {
+	private static final File TARGET_DIR = new File("target");
+
+	private static final File CLASSES_DIR = new File(TARGET_DIR, "classes");
+
+	private static final File TARGET_GENERATEDSOURCES_DIR = new File(TARGET_DIR, "generated-sources");
+
+	private static final File TENG_DIR = new File(TARGET_GENERATEDSOURCES_DIR, "teng");
+
+	private static final File TENG_CLASSES_DIR = new File(TARGET_GENERATEDSOURCES_DIR, "classes");
+
 	private TengParser parser;
 
 	@Before
@@ -43,7 +66,7 @@ public class TengParserTest
 				"",
 				"String type",
 				"-----");
-		outputTemplateJavaFile(lines);
+		compileTemplateJavaFile(outputTemplateJavaFile(lines));
 	}
 
 	@Test
@@ -57,7 +80,7 @@ public class TengParserTest
 				"String type",
 				"-----",
 				"xxx");
-		outputTemplateJavaFile(lines);
+		compileTemplateJavaFile(outputTemplateJavaFile(lines));
 	}
 
 	@Test
@@ -72,7 +95,7 @@ public class TengParserTest
 				"-----",
 				"xxx",
 				"yyy");
-		outputTemplateJavaFile(lines);
+		compileTemplateJavaFile(outputTemplateJavaFile(lines));
 	}
 
 	@Test
@@ -90,7 +113,7 @@ public class TengParserTest
 				"end-of-line                windows",
 				"-----",
 				"xxx");
-		outputTemplateJavaFile(lines);
+		compileTemplateJavaFile(outputTemplateJavaFile(lines));
 	}
 
 	@Test
@@ -141,12 +164,13 @@ public class TengParserTest
 				"#end-if",
 				"verbatim",
 				"");
-		outputTemplateJavaFile(lines);
+		compileTemplateJavaFile(outputTemplateJavaFile(lines));
 	}
 
 	@Test
 	public final void test6()
 	{
+		test4();
 		final ImmutableList<String> lines = ImmutableList.of(
 				"# Copyright (C) 2016 Me",
 				"",
@@ -154,12 +178,13 @@ public class TengParserTest
 				"-----",
 				"    @{TheBlockTemplate4()}@",
 				"");
-		outputTemplateJavaFile(lines);
+		compileTemplateJavaFile(outputTemplateJavaFile(lines));
 	}
 
 	@Test
 	public final void test7()
 	{
+		test3();
 		final ImmutableList<String> lines = ImmutableList.of(
 				"# Copyright (C) 2016 Me",
 				"",
@@ -167,7 +192,7 @@ public class TengParserTest
 				"-----",
 				"    %{TheInlineTemplate3(\"Hello\", \"World!\")}%",
 				"");
-		outputTemplateJavaFile(lines);
+		compileTemplateJavaFile(outputTemplateJavaFile(lines));
 	}
 
 	@Test
@@ -181,12 +206,14 @@ public class TengParserTest
 				"-----",
 				"    ${list.size()}$",
 				"");
-		outputTemplateJavaFile(lines);
+		compileTemplateJavaFile(outputTemplateJavaFile(lines));
 	}
 
 	@Test
 	public final void test9()
 	{
+		test3();
+		test4();
 		final ImmutableList<String> lines = ImmutableList.of(
 				"# Copyright (C) 2016 Me",
 				"",
@@ -198,7 +225,7 @@ public class TengParserTest
 				"",
 				"    ${type.charAt(0)}$    %{TheInlineTemplate3(type, name)}%    @{TheBlockTemplate4()}@",
 				"");
-		outputTemplateJavaFile(lines);
+		compileTemplateJavaFile(outputTemplateJavaFile(lines));
 	}
 
 	@Test
@@ -223,7 +250,7 @@ public class TengParserTest
 				"    #end-for",
 				"#end-for",
 				"");
-		outputTemplateJavaFile(lines);
+		compileTemplateJavaFile(outputTemplateJavaFile(lines));
 	}
 
 	@Test
@@ -239,7 +266,7 @@ public class TengParserTest
 				"",
 				"private ${type}$ ${name}$;",
 				"");
-		outputTemplateJavaFile(lines);
+		compileTemplateJavaFile(outputTemplateJavaFile(lines));
 	}
 
 	@Test
@@ -258,7 +285,7 @@ public class TengParserTest
 				"\treturn ${name}$;",
 				"}",
 				"");
-		outputTemplateJavaFile(lines);
+		compileTemplateJavaFile(outputTemplateJavaFile(lines));
 	}
 
 	@Test
@@ -278,12 +305,15 @@ public class TengParserTest
 				"\treturn this;",
 				"}",
 				"");
-		outputTemplateJavaFile(lines);
+		compileTemplateJavaFile(outputTemplateJavaFile(lines));
 	}
 
 	@Test
 	public final void entity()
 	{
+		field();
+		getter();
+		setter();
 		final ImmutableList<String> lines = ImmutableList.of(
 				"template Entity",
 				"",
@@ -294,24 +324,23 @@ public class TengParserTest
 				"public final class ${name}$",
 				"{",
 				"    #for com.github.hilcode.teng.stuff.FieldInfo loopVar : fields",
-				"\t@{ Field ( loopVar.item.type, loopVar.item.name ) }@",
+				"\t@{ Field ( loopVar.item.type(), loopVar.item.name() ) }@",
 				"    #end-for",
 				"    #for com.github.hilcode.teng.stuff.FieldInfo loopVar : fields",
 				"",
-				"\t@{Getter(loopVar.item.type, loopVar.item.name)}@",
+				"\t@{Getter(loopVar.item.type(), loopVar.item.name())}@",
 				"",
-				"\t@{Setter(loopVar.item.type, loopVar.item.name)}@",
+				"\t@{Setter(loopVar.item.type(), loopVar.item.name())}@",
 				"    #end-for",
 				"}");
-		outputTemplateJavaFile(lines);
+		compileTemplateJavaFile(outputTemplateJavaFile(lines));
 	}
 
-	public final void outputTemplateJavaFile(final ImmutableList<String> lines)
+	public final File outputTemplateJavaFile(final ImmutableList<String> lines)
 	{
-		final File rootDir = new File("target/generated-sources/teng");
 		final StringReader source = new StringReader(Joiner.on('\n').join(lines) + "\n");
 		final JavaTemplate template = this.parser.parse(source);
-		final File packageDir = new File(rootDir, template.javaFile.packageName.value.replace('.', '/'));
+		final File packageDir = new File(TENG_DIR, template.javaFile.packageName.value.replace('.', '/'));
 		packageDir.mkdirs();
 		final File javaFile = new File(packageDir, template.javaFile.name + ".java");
 		try
@@ -323,6 +352,7 @@ public class TengParserTest
 				{
 					fw.append(line);
 				}
+				return javaFile;
 			}
 			finally
 			{
@@ -333,5 +363,46 @@ public class TengParserTest
 		{
 			throw new IllegalStateException(e.getMessage(), e);
 		}
+	}
+
+	public final void compileTemplateJavaFile(final File javaFile)
+	{
+		final JavaCompiler javaCompiler = ToolProvider.getSystemJavaCompiler();
+		final DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
+		final StandardJavaFileManager fileManager = javaCompiler.getStandardFileManager(diagnostics, Locale.getDefault(), Charset.forName("UTF-8"));
+		try
+		{
+			CLASSES_DIR.mkdirs();
+			fileManager.setLocation(StandardLocation.CLASS_OUTPUT, Lists.newArrayList(CLASSES_DIR));
+			fileManager.setLocation(StandardLocation.CLASS_PATH, extractClasspath());
+			fileManager.setLocation(StandardLocation.SOURCE_PATH, Lists.newArrayList(TENG_DIR));
+		}
+		catch (final IOException e)
+		{
+			throw new IllegalStateException(e.getMessage(), e);
+		}
+		final Iterable<? extends JavaFileObject> compilationUnits = fileManager.getJavaFileObjectsFromFiles(Arrays.asList(javaFile));
+		final boolean result = javaCompiler.getTask(null, fileManager, diagnostics, null, null, compilationUnits).call().booleanValue();
+		if (!result)
+		{
+			for (final Diagnostic<?> error : diagnostics.getDiagnostics())
+			{
+				System.err.println(error);
+			}
+			throw new IllegalStateException("Compilation failed.");
+		}
+	}
+
+	public final ImmutableList<File> extractClasspath()
+	{
+		final String javaClasspath = System.getProperty("java.class.path");
+		final String pathSeparator = System.getProperty("path.separator");
+		final ImmutableList.Builder<File> classpathBuilder = ImmutableList.builder();
+		for (final String classpathEntry : Splitter.on(pathSeparator).split(javaClasspath))
+		{
+			classpathBuilder.add(new File(classpathEntry));
+		}
+		classpathBuilder.add(TENG_CLASSES_DIR);
+		return classpathBuilder.build();
 	}
 }
