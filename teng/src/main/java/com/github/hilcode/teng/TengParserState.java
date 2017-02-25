@@ -15,7 +15,7 @@
  */
 package com.github.hilcode.teng;
 
-import static com.github.hilcode.teng.EndOfLine.NATIVE;
+import static com.github.hilcode.teng.EndOfLine.UNIX;
 import java.util.List;
 import com.google.common.collect.Lists;
 
@@ -23,40 +23,56 @@ public final class TengParserState
 {
 	public final List<LineAndSource> templateBuilder;
 
-	public boolean loopVarNeeded = false;
+	public final List<Parameter> parameters;
 
-	public boolean tengNeeded = false;
+	public final List<Import> imports;
 
-	public boolean immutableListNeeded = false;
+	public int indentationLevel;
 
-	public JavaFile templateName = null;
+	public boolean loopVarNeeded;
 
-	public boolean blockTemplate = true;
+	public boolean tengNeeded;
 
-	public String blockTemplateBegin = "@{";
+	public boolean immutableListNeeded;
 
-	public String blockTemplateEnd = "}@";
+	public JavaFile templateName;
 
-	public String inlineTemplateBegin = "%{";
+	public boolean blockTemplate;
 
-	public String inlineTemplateEnd = "}%";
+	public String blockTemplateBegin;
 
-	public String variableBegin = "${";
+	public String blockTemplateEnd;
 
-	public String variableEnd = "}$";
+	public String inlineTemplateBegin;
 
-	public String directivePrefix = "#";
+	public String inlineTemplateEnd;
 
-	public EndOfLine endOfLine = NATIVE;
+	public String variableBegin;
 
-	public int indentationLevel = 0;
+	public String variableEnd;
 
-	public final List<Parameter> parameters = Lists.newArrayList();
+	public String directivePrefix;
 
-	public final List<Import> imports = Lists.newArrayList();
+	public EndOfLine endOfLine;
 
 	public TengParserState()
 	{
 		this.templateBuilder = Lists.newArrayList();
+		this.parameters = Lists.newArrayList();
+		this.imports = Lists.newArrayList();
+		this.indentationLevel = 0;
+		this.loopVarNeeded = false;
+		this.tengNeeded = false;
+		this.immutableListNeeded = false;
+		this.templateName = null;
+		this.blockTemplate = true;
+		this.blockTemplateBegin = "@{";
+		this.blockTemplateEnd = "}@";
+		this.inlineTemplateBegin = "%{";
+		this.inlineTemplateEnd = "}%";
+		this.variableBegin = "${";
+		this.variableEnd = "}$";
+		this.directivePrefix = "#";
+		this.endOfLine = UNIX;
 	}
 }
