@@ -40,8 +40,8 @@
 							<goal>run-with-enum</goal>
 						</goals>
 						<configuration>
-							<templateClassName>org.example.Entity</templateClassName>
-							<modelClassName>com.github.hilcode.teng.EntityInfo</modelClassName>
+							<templateClassName>org.example.Identifier</templateClassName>
+							<modelClassName>com.github.hilcode.teng.BluePrint$Id</modelClassName>
 						</configuration>
 					</execution>
 				</executions>

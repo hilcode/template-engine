@@ -1,0 +1,29 @@
+template org.example.Identifier
+
+import com.github.hilcode.teng.BluePrint
+
+BluePrint.Id id
+
+-----
+package org.example;
+
+import java.util.UUID;
+import com.google.common.collect.Interner;
+import com.google.common.collect.Interners;
+
+public final class ${id.type.name}$
+	extends
+		Identifier<${id.type.name}$>
+{
+	private static final Interner<${id.type.name}$> INTERNER = Interners.newWeakInterner();
+
+	public final static ${id.type.name}$ make(final UUID value)
+	{
+		return INTERNER.intern(new ${id.type.name}$(value));
+	}
+
+	private ${id.type.name}$(final UUID value)
+	{
+		super(value);
+	}
+}

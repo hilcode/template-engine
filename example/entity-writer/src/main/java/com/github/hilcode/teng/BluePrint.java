@@ -13,12 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.example;
+package com.github.hilcode.teng;
 
 import com.google.common.collect.ImmutableList;
 
 public interface BluePrint
 {
+	public static enum Id
+	{
+		AUTHOR_ID(Type.AUTHOR_ID),
+		BOOK_ID(Type.BOOK_ID),
+		BOOK_SERIES_ID(Type.BOOK_SERIES_ID),
+		PUBLISHER_ID(Type.PUBLISHER_ID),
+		//
+		;
+		public final Type type;
+
+		private Id(final Type type)
+		{
+			this.type = type;
+		}
+	}
+
 	public static enum Entity
 	{
 		PUBLISHER(
@@ -81,19 +97,27 @@ public interface BluePrint
 
 	public static enum Type
 	{
-		TEXT_32,
-		TEXT_128,
-		TEXT_256,
-		YEAR,
-		ISBN,
-		AUTHOR,
-		AUTHOR_ID,
-		BOOK,
-		BOOK_ID,
-		BOOK_SERIES,
-		BOOK_SERIES_ID,
-		PUBLISHER,
-		PUBLISHER_ID,
-		BOOKS,
+		TEXT_32("String"),
+		TEXT_128("String"),
+		TEXT_256("String"),
+		YEAR("int"),
+		ISBN("String"),
+		AUTHOR("String"),
+		AUTHOR_ID("AuthorId"),
+		BOOK("Book"),
+		BOOK_ID("BookId"),
+		BOOK_SERIES("BookSeries"),
+		BOOK_SERIES_ID("BookSeriesId"),
+		PUBLISHER("Publisher"),
+		PUBLISHER_ID("PublisherId"),
+		BOOKS("Books"),
+		//
+		;
+		public final String name;
+
+		private Type(final String name)
+		{
+			this.name = name;
+		}
 	}
 }

@@ -185,10 +185,12 @@ public final class MojoUtils
 	{
 		final Class<?> templateClass = loadClass(classLoader, templateName);
 		final Method executeMethod = templateClass.getMethods()[0];
+		System.err.println("executeMethod = " + executeMethod);
 		if (executeMethod.getReturnType() == Template.Block.class)
 		{
 			final StringBuilder result = new StringBuilder();
-			for (final String line : invokeStaticMethod(Template.Block.class, executeMethod, model).execute())
+			final Iterable<String> lines = invokeStaticMethod(Template.Block.class, executeMethod, model).execute();
+			for (final String line : lines)
 			{
 				result.append(line);
 			}
