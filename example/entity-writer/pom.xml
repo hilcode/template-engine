@@ -10,7 +10,7 @@
 	<groupId>com.github.hilcode</groupId>
 	<artifactId>teng-entity-writer</artifactId>
 	<packaging>jar</packaging>
-	<version>0.1</version>
+	<version>0.2-SNAPSHOT</version>
 
 	<name>Teng Entity Writer</name>
 
@@ -19,7 +19,7 @@
 		<dependency>
 			<groupId>com.github.hilcode</groupId>
 			<artifactId>teng</artifactId>
-			<version>0.1</version>
+			<version>0.3-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
@@ -37,7 +37,7 @@
 			<plugin>
 				<groupId>com.github.hilcode</groupId>
 				<artifactId>teng-maven-plugin</artifactId>
-				<version>0.1</version>
+				<version>0.2.1-SNAPSHOT</version>
 				<executions>
 					<execution>
 						<id>generate-sources-compile</id>

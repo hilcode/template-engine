@@ -10,7 +10,7 @@
 	<groupId>com.github.hilcode</groupId>
 	<artifactId>teng-entities</artifactId>
 	<packaging>jar</packaging>
-	<version>0.1</version>
+	<version>0.2-SNAPSHOT</version>
 
 	<name>Entities</name>
 
@@ -31,13 +31,13 @@
 			<plugin>
 				<groupId>com.github.hilcode</groupId>
 				<artifactId>teng-maven-plugin</artifactId>
-				<version>0.1</version>
+				<version>0.2.1-SNAPSHOT</version>
 				<executions>
 					<execution>
 						<id>generate-sources-run</id>
 						<phase>generate-sources</phase>
 						<goals>
-							<goal>run</goal>
+							<goal>run-with-enum</goal>
 						</goals>
 						<configuration>
 							<templateClassName>org.example.Entity</templateClassName>
@@ -49,7 +49,7 @@
 					<dependency>
 						<groupId>com.github.hilcode</groupId>
 						<artifactId>teng-entity-writer</artifactId>
-						<version>0.1</version>
+						<version>0.2-SNAPSHOT</version>
 					</dependency>
 				</dependencies>
 			</plugin>
